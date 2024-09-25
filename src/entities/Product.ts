@@ -54,8 +54,8 @@ export class Product {
   @Column({ type: 'enum', enum: ['USD', 'VND'] }) 
   currency: string;
 
-  @Column({type: 'varchar', length: 100})
-  images: string;
+  @Column({ type: 'simple-array' })
+  images: string[];
 
   @Column()
   createdDate: Date;

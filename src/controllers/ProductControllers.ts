@@ -3,12 +3,12 @@ import { ProductService } from '../services/ProductService';
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
-    const file = req.file as Express.Multer.File | undefined;
+    const files = req.files as Express.Multer.File[] | undefined;
 
-    if (!file) {
+    if (!files || files.length === 0) {
       return res.status(400).json({ 
         status: 'error', 
-        error: 'No image file uploaded' 
+        error: 'No image files uploaded' 
       });
     }
 
@@ -40,11 +40,13 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
-    const imageUrl = await ProductService.uploadImageFromBuffer(file.buffer);
-    
+    const imageUrls = await Promise.all(
+      files.map(file => ProductService.uploadImageFromBuffer(file.buffer))
+    );
+
     const productData = {
       ...req.body,
-      images: imageUrl, 
+      images: imageUrls, 
     };
 
     const newProduct = await ProductService.createProduct(productData);

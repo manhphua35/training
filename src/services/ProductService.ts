@@ -11,10 +11,10 @@ export class ProductService {
         if (error || !result) {
           return reject(new Error('Failed to upload image to Cloudinary'));
         }
-        resolve(result.secure_url);  // Đảm bảo rằng `result` tồn tại trước khi truy cập `secure_url`
+        resolve(result.secure_url);  
       });
   
-      uploadStream.end(buffer);  // Đẩy buffer vào uploadStream
+      uploadStream.end(buffer);  
     });
   }
   
