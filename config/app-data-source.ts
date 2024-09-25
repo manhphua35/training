@@ -1,7 +1,10 @@
 import { DataSource } from "typeorm";
+import { Product } from "../src/entities/Product";
+import { Image } from "../src/entities/Images";
+import { MainCategory } from "../src/entities/MainCategory";
+import { SubCategory } from "../src/entities/SubCategory";
 
 
-console.log('Host:', process.env.HOST);
 
 
 export const myDataSource = new DataSource({
@@ -11,7 +14,7 @@ export const myDataSource = new DataSource({
     username: 'sql12731973',  
     password: process.env.PASSWORD,  
     database: process.env.DATABASE,
-    entities: ["src/entities/*.ts"],  
+    entities: [Product, Image, MainCategory, SubCategory],  
     synchronize: true,
     ssl: false,
     insecureAuth : true

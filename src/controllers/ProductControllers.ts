@@ -40,7 +40,6 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
-    // Upload ảnh từ buffer thay vì từ file path
     const imageUrl = await ProductService.uploadImageFromBuffer(file.buffer);
     
     const productData = {
