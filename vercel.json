@@ -1,29 +1,15 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "src/index.ts",
-        "use": "@vercel/node",
-        "config": {
-          "includeFiles": ["src/**/*.ts"]
-        }
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "src/index.ts"
-      }
-    ],
-    "env": {
-      "PORT": "3000",
-      "CLOUD_NAME": "dfzsgc9lb",
-      "API_KEY": "213326358418463",
-      "API_SECRET": "H4-OYEpTA1i5W7VbQ1DBKint3Os",
-      "HOST": "sql12.freesqldatabase.com",
-      "USERNAME": "sql12731973",
-      "PASSWORD": "Rpu89MgJPr",
-      "DATABASE": "sql12731973"
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/index.ts",
+      "use": "@vercel/node"
     }
-  }
-  
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/index.ts"
+    }
+  ]
+}

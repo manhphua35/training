@@ -8,17 +8,17 @@ import routes from './routes';
 const app = express();
 const port = process.env.PORT;
 
-const upload = multer({ dest: 'uploads/' });
+// Cấu hình memoryStorage cho multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 app.use(express.json());
-
 
 routes(app);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
-
 
 myDataSource
   .initialize()

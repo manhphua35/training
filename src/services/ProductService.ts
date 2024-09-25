@@ -5,17 +5,19 @@ import { SubCategoryRepository } from '../repositories/SubCategoryRepository';
 
 export class ProductService {
   
-  static async uploadImage(filePath: string): Promise<string> {
-    try {
-      const result = await cloudinary.uploader.upload(filePath, {
-        folder: 'products',
-        public_id: Date.now().toString(),
+  static async uploadImageFromBuffer(buffer: Buffer): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream({ folder: 'products' }, (error, result) => {
+        if (error || !result) {
+          return reject(new Error('Failed to upload image to Cloudinary'));
+        }
+        resolve(result.secure_url);  // Đảm bảo rằng `result` tồn tại trước khi truy cập `secure_url`
       });
-      return result.secure_url; 
-    } catch (error) {
-      throw new Error('Failed to upload image to Cloudinary');
-    }
+  
+      uploadStream.end(buffer);  // Đẩy buffer vào uploadStream
+    });
   }
+  
 
   static async createProduct(productData: Partial<Product>): Promise<Product> {
     const existingProduct = await ProductRepository.findOneBy({ serialNumber: productData.serialNumber });
