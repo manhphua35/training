@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne, CreateDateColumn, BeforeInsert } from 'typeorm';
 import { SubCategory } from './SubCategory'; // Import SubCategory to establish relation
 
 @Entity()
@@ -57,6 +57,11 @@ export class Product {
   @Column({type: 'varchar', length: 100})
   images: string;
 
-  @CreateDateColumn()
-  createdDate: Date
+  @Column()
+  createdDate: Date;
+
+  @BeforeInsert()
+  setCreationDate() {
+    this.createdDate = new Date();
+  }
 }

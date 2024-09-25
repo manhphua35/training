@@ -18,7 +18,11 @@ export class ProductService {
   }
 
   static async createProduct(productData: Partial<Product>): Promise<Product> {
-    console.log(productData.category)
+    const existingProduct = await ProductRepository.findOneBy({ serialNumber: productData.serialNumber });
+    if (existingProduct) {
+      throw new Error('Product with this serial number already exists');
+    }
+
     if (!productData.category) {
       throw new Error('Category is required');
     }

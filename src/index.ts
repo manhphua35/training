@@ -1,13 +1,12 @@
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 import "reflect-metadata";
-import * as dotenv from "dotenv";
+import 'dotenv/config';
 import { myDataSource } from '../config/app-data-source';
 import routes from './routes';
 
 const app = express();
 const port = process.env.PORT;
-dotenv.config();
 
 const upload = multer({ dest: 'uploads/' });
 

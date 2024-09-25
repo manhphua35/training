@@ -1,12 +1,16 @@
 import { DataSource } from "typeorm";
 
+
+console.log('Host:', process.env.HOST);
+
+
 export const myDataSource = new DataSource({
     type: "mysql",
-    host: "localhost",
+    host: process.env.HOST,
     port: 3306,
-    username: "root",  
-    password: "123456",  
-    database: "ecommerce",
+    username: 'sql12731973',  
+    password: process.env.PASSWORD,  
+    database: process.env.DATABASE,
     entities: ["src/entities/*.ts"],  
     synchronize: true,
     ssl: false,
