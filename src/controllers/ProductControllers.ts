@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ProductService } from '../services/ProductService';
+import { checkMissingFields } from '../validators/requiredFields';
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
@@ -12,26 +13,9 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
-    const { name, category, price, description, serialNumber, brand, model, condition, yearOfManufacture, usageDuration, title, weight, height, city, postalCode, specificAddress, currency } = req.body;
+    const requiredFields = ['serialNumber', 'name', 'category', 'price', 'description', 'brand', 'model', 'condition', 'yearOfManufacture', 'usageDuration', 'title', 'weight', 'height', 'city', 'postalCode', 'specificAddress', 'currency'];
 
-    const missingFields = [];
-    if (!serialNumber) missingFields.push('serialNumber');
-    if (!name) missingFields.push('name');
-    if (!category) missingFields.push('category');
-    if (!price) missingFields.push('price');
-    if (!description) missingFields.push('description');
-    if (!brand) missingFields.push('brand');
-    if (!model) missingFields.push('model');
-    if (!condition) missingFields.push('condition');
-    if (!yearOfManufacture) missingFields.push('yearOfManufacture');
-    if (!usageDuration) missingFields.push('usageDuration');
-    if (!title) missingFields.push('title');
-    if (!weight) missingFields.push('weight');
-    if (!height) missingFields.push('height');
-    if (!city) missingFields.push('city');
-    if (!postalCode) missingFields.push('postalCode');
-    if (!specificAddress) missingFields.push('specificAddress');
-    if (!currency) missingFields.push('currency');
+    const missingFields = checkMissingFields(req.body, requiredFields);
 
     if (missingFields.length > 0) {
       return res.status(400).json({ 
