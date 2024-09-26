@@ -7,6 +7,7 @@ import { ResError } from '../utils/ResError';
 export const createProduct = async (req: Request, res: Response) => {
   try {
     const files = req.files as Express.Multer.File[] | undefined;
+    
     if (!files || files.length === 0) {
       throw new ResError(400, 'No image files uploaded');
     }
@@ -20,9 +21,9 @@ export const createProduct = async (req: Request, res: Response) => {
     ];
 
     const missingFields = checkMissingFields(req.body, requiredFields);
-  if (missingFields.length > 0) {
-    throw new ResError(400, `Missing required fields: ${missingFields.join(', ')}`);
-  }
+    if (missingFields.length > 0) {
+      throw new ResError(400, `Missing required fields: ${missingFields.join(', ')}`);
+    }
 
     const imageUrls = await Promise.all(
       files.map(file => ProductService.uploadImageFromBuffer(file.buffer))

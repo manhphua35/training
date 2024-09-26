@@ -6,18 +6,34 @@ import { ResError } from '../utils/ResError';
 
 export class ProductService {
 
+  // Hàm upload ảnh với text overlay
   static async uploadImageFromBuffer(buffer: Buffer): Promise<string> {
     return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream({ folder: 'products' }, (error, result) => {
+      const uploadStream = cloudinary.uploader.upload_stream({
+        folder: 'products',
+        transformation: [
+          {
+            overlay: {
+              font_family: "Arial", font_size: "10p", font_weight: "bold", text: "watermark"
+            },
+            gravity: "south_east", // Vị trí của text
+            x: 5, y: 5,          // Khoảng cách so với góc
+            color: "black",        // Màu chữ
+            opacity: 70            // Độ trong suốt của nền
+          }
+        ]
+      }, (error, result) => {
         if (error || !result) {
           return reject(new ResError(500, 'Failed to upload image to Cloudinary'));
         }
         resolve(result.secure_url);
       });
-      uploadStream.end(buffer);
+
+      uploadStream.end(buffer);  // Kết thúc stream và upload file
     });
   }
 
+  // Hàm tạo sản phẩm
   static async createProduct(productData: Partial<Product>): Promise<Product> {
     const existingProduct = await ProductRepository.findOneBy({ serialNumber: productData.serialNumber });
     if (existingProduct) {
