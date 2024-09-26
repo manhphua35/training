@@ -4,12 +4,15 @@ import "reflect-metadata";
 import 'dotenv/config';
 import { connectWithRetry } from '../config/app-data-source';
 import routes from './routes';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT;
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+app.use(cors());
 
 app.use(express.json()); 
 
