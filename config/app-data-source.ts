@@ -17,7 +17,7 @@ export const myDataSource = new DataSource({
     insecureAuth: true,
     extra: {
         connectionLimit: 10,  
-        keepAlive: true       
+        keepAlive: true      
     }
 });
 
@@ -30,6 +30,18 @@ export async function connectWithRetry() {
         try {
             await myDataSource.initialize();
             console.log("Data Source has been initialized!");
+
+            setInterval(async () => {
+                if (myDataSource.isInitialized) {
+                    try {
+                        await myDataSource.query('SELECT 1');  
+                        console.log('Ping to keep connection alive');
+                    } catch (err) {
+                        console.error('Ping failed:', err);
+                    }
+                }
+            }, 60000);  
+
             break;
         } catch (err) {
             attempts++;
@@ -44,4 +56,3 @@ export async function connectWithRetry() {
     }
 }
 
-connectWithRetry();

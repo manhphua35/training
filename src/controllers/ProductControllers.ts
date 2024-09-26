@@ -13,7 +13,7 @@ export const createProduct = async (req: Request, res: Response) => {
       });
     }
 
-    const requiredFields = ['serialNumber', 'name', 'category', 'price', 'description', 'brand', 'model', 'condition', 'yearOfManufacture', 'usageDuration', 'title', 'weight', 'height', 'city', 'postalCode', 'specificAddress', 'currency'];
+    const requiredFields = ['serialNumber', 'name', 'category', 'price', 'description', 'brand', 'model', 'conditional', 'yearOfManufacture', 'usageDuration', 'title', 'weight', 'height', 'city', 'postalCode', 'specificAddress', 'currency'];
 
     const missingFields = checkMissingFields(req.body, requiredFields);
 

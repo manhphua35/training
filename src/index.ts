@@ -11,7 +11,7 @@ const port = process.env.PORT;
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.use(express.json());
+app.use(express.json()); 
 
 routes(app);
 
@@ -21,7 +21,5 @@ app.get('/', (req: Request, res: Response) => {
 
 app.listen(port, async () => {
     console.log(`Server starting at port ${port}`);
-    await connectWithRetry();  // Gọi hàm retry thay vì initialize()
+    await connectWithRetry();  
 });
-
-

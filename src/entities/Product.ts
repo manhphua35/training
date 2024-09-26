@@ -19,7 +19,7 @@ export class Product {
   model: string;
 
   @Column({ type: 'enum', enum: ['new', 'used'] }) 
-  condition: string;
+  conditional: string;
 
   @Column({ type: 'int' })
   yearOfManufacture: number;
