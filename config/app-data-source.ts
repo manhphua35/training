@@ -24,7 +24,7 @@ export const myDataSource = new DataSource({
 const MAX_RETRY = 10;
 const RETRY_DELAY = 2000;
 
-async function connectWithRetry() {
+export async function connectWithRetry() {
     let attempts = 0;
     while (attempts < MAX_RETRY) {
         try {

@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import multer from 'multer';
 import "reflect-metadata";
 import 'dotenv/config';
-import { myDataSource } from '../config/app-data-source';
+import { connectWithRetry } from '../config/app-data-source';
 import routes from './routes';
 
 const app = express();
@@ -19,15 +19,9 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
 
-myDataSource
-  .initialize()
-  .then(() => {
-    console.log("Data Source has been initialized!");
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization:", err);
-  });
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(port, async () => {
+    console.log(`Server starting at port ${port}`);
+    await connectWithRetry();  // Gọi hàm retry thay vì initialize()
 });
+
+
