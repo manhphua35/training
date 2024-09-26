@@ -14,11 +14,15 @@ export const myDataSource = new DataSource({
     entities: [Product, Image, MainCategory, SubCategory],
     synchronize: true,
     ssl: false,
-    insecureAuth: true
+    insecureAuth: true,
+    extra: {
+        connectionLimit: 10,  
+        keepAlive: true       
+    }
 });
 
-const MAX_RETRY = 5; 
-const RETRY_DELAY = 2000; 
+const MAX_RETRY = 10;
+const RETRY_DELAY = 2000;
 
 async function connectWithRetry() {
     let attempts = 0;
@@ -26,18 +30,18 @@ async function connectWithRetry() {
         try {
             await myDataSource.initialize();
             console.log("Data Source has been initialized!");
-            break; 
+            break;
         } catch (err) {
             attempts++;
             console.error(`Attempt ${attempts} failed. Retrying in ${RETRY_DELAY / 1000} seconds...`);
-            await new Promise(res => setTimeout(res, RETRY_DELAY)); 
+            await new Promise(res => setTimeout(res, RETRY_DELAY));
         }
     }
 
     if (attempts === MAX_RETRY) {
         console.error("Could not connect to the database after multiple attempts.");
-        process.exit(1); 
+        process.exit(1);
     }
 }
 
-connectWithRetry(); 
+connectWithRetry();

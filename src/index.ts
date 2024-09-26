@@ -8,7 +8,6 @@ import routes from './routes';
 const app = express();
 const port = process.env.PORT;
 
-// Cấu hình memoryStorage cho multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
