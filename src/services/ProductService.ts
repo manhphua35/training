@@ -42,8 +42,7 @@ export class ProductService {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.destroy(publicId, (error, result) => {
         if (error) {
-          console.log(`Failed to delete image from Cloudinary: ${publicId}`, error);
-          return reject(new ResError(500, `Failed to delete image from Cloudinary: ${publicId}`));
+          return reject(new ResError(500, `Failed to delete image from Cloudinary: `));
         }
         resolve();
       });

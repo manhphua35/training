@@ -56,10 +56,8 @@ export const createProduct = async (req: Request, res: Response) => {
       throw new ResError(400, 'Usage duration must be a positive number.');
     }
 
-    // Tạo instance của ProductService
     const productService = new ProductService();
 
-    // Upload ảnh và lưu product
     const imageBuffers = files.map(file => file.buffer);
     const newProduct = await productService.createProduct(req.body, imageBuffers);
 
