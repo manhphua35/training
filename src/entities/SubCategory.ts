@@ -8,7 +8,7 @@ export class SubCategory {
   id: number;
 
   @Column({ type: 'nvarchar', length: 50 })
-  name: string;
+  subCategoryName: string;
 
   @ManyToOne(() => MainCategory, (mainCategory) => mainCategory.subCategories)
   @JoinColumn({ name: 'main_category_id' })  

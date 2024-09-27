@@ -15,7 +15,7 @@ export const createProduct = async (req: Request, res: Response) => {
     validateImages(files);
 
     const requiredFields = [
-      'serialNumber', 'name', 'category', 'price', 'description', 'brand', 
+      'serialNumber', 'productName', 'category', 'price', 'description', 'brand', 
       'model', 'conditional', 'yearOfManufacture', 'usageDuration', 'title', 
       'weight', 'height', 'city', 'postalCode', 'specificAddress', 'currency'
     ];
@@ -25,16 +25,43 @@ export const createProduct = async (req: Request, res: Response) => {
       throw new ResError(400, `Missing required fields: ${missingFields.join(', ')}`);
     }
 
-    const imageUrls = await Promise.all(
-      files.map(file => ProductService.uploadImageFromBuffer(file.buffer))
-    );
+    const validConditionals = ['new', 'used'];
+    const validCurrencies = ['USD', 'VND'];
 
-    const productData = {
-      ...req.body,
-      images: imageUrls,
-    };
+    if (!validConditionals.includes(req.body.conditional)) {
+      throw new ResError(400, `Invalid value for 'conditional'. Allowed values are: ${validConditionals.join(', ')}`);
+    }
 
-    const newProduct = await ProductService.createProduct(productData);
+    if (!validCurrencies.includes(req.body.currency)) {
+      throw new ResError(400, `Invalid value for 'currency'. Allowed values are: ${validCurrencies.join(', ')}`);
+    }
+
+    const numericFields = ['price', 'yearOfManufacture', 'usageDuration', 'weight', 'height'];
+    
+    numericFields.forEach((field) => {
+      if (isNaN(req.body[field])) {
+        throw new ResError(400, `Invalid value for '${field}'. It must be a number.`);
+      }
+    });
+
+    if (req.body.price <= 0) {
+      throw new ResError(400, 'Price must be a positive number.');
+    }
+
+    if (req.body.yearOfManufacture < 1900 || req.body.yearOfManufacture > new Date().getFullYear()) {
+      throw new ResError(400, 'Invalid year of manufacture.');
+    }
+
+    if (req.body.usageDuration < 0) {
+      throw new ResError(400, 'Usage duration must be a positive number.');
+    }
+
+    // Tạo instance của ProductService
+    const productService = new ProductService();
+
+    // Upload ảnh và lưu product
+    const imageBuffers = files.map(file => file.buffer);
+    const newProduct = await productService.createProduct(req.body, imageBuffers);
 
     return res.status(201).json({
       status: 'success',

@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn, ManyToOne, CreateDateColumn, BeforeInsert } from 'typeorm';
-import { SubCategory } from './SubCategory'; // Import SubCategory to establish relation
+import { Entity, Column, PrimaryColumn, ManyToOne, CreateDateColumn, BeforeInsert, OneToMany } from 'typeorm';
+import { SubCategory } from './SubCategory'; 
+import { ProductImage } from './ProductImage';
 
 @Entity()
 export class Product {
@@ -10,7 +11,7 @@ export class Product {
   category: SubCategory;
 
   @Column({ type: 'varchar', length: 50 })
-  name: string;
+  productName: string;
 
   @Column({ type: 'varchar', length: 50 })
   brand: string;
@@ -54,8 +55,8 @@ export class Product {
   @Column({ type: 'enum', enum: ['USD', 'VND'] }) 
   currency: string;
 
-  @Column({ type: 'simple-array' })
-  images: string[];
+  @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
+  images: ProductImage[];  
 
   @Column()
   createdDate: Date;

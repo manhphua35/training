@@ -1,4 +1,5 @@
 import { MainCategoryRepository } from '../repositories/MainCategoryRepository';
+import { ResError } from '../utils/ResError';
 
 export class CategoryService {
   public static async getAllCategories() {
@@ -8,7 +9,7 @@ export class CategoryService {
       });
       return categories;
     } catch (error) {
-      throw new Error('Failed to fetch categories');
+      throw new ResError(400,'Failed to fetch categories');
     }
   }
 }

@@ -2,7 +2,7 @@ import { DataSource } from "typeorm";
 import { SubCategory } from "../src/entities/SubCategory";
 import { MainCategory } from "../src/entities/MainCategory";
 import { Product } from "../src/entities/Product";
-import { Image } from "../src/entities/Images";
+import { ProductImage } from "../src/entities/ProductImage";
 
 export const myDataSource = new DataSource({
     type: "mysql",
@@ -11,10 +11,8 @@ export const myDataSource = new DataSource({
     username: 'sql12731973',
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
-    entities: [Product, Image, MainCategory, SubCategory],
+    entities: [Product, ProductImage, MainCategory, SubCategory],
     synchronize: true,
-    ssl: false,
-    insecureAuth: true,
     extra: {
         connectionLimit: 10,  
         keepAlive: true      
@@ -22,7 +20,7 @@ export const myDataSource = new DataSource({
 });
 
 const MAX_RETRY = 10;
-const RETRY_DELAY = 2000;
+const RETRY_DELAY = 60000;
 
 export async function connectWithRetry() {
     let attempts = 0;
@@ -40,7 +38,7 @@ export async function connectWithRetry() {
                         console.error('Ping failed:', err);
                     }
                 }
-            }, 60000);  
+            }, 120000);  
 
             break;
         } catch (err) {

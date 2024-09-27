@@ -7,7 +7,7 @@ export class MainCategory {
   id: number;
 
   @Column({ type: 'nvarchar', length: 50 })
-  name: string;
+  mainCategoryName: string;
 
   @OneToMany(() => SubCategory, (subCategory) => subCategory.mainCategory)
   subCategories: SubCategory[];
