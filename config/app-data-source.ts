@@ -3,12 +3,15 @@ import { SubCategory } from "../src/entities/SubCategory";
 import { MainCategory } from "../src/entities/MainCategory";
 import { Product } from "../src/entities/Product";
 import { ProductImage } from "../src/entities/ProductImage";
+import 'dotenv/config';
+
+
 
 export const myDataSource = new DataSource({
     type: "mysql",
     host: process.env.HOST,
     port: 3306,
-    username: 'sql12731973',
+    username: process.env.USERDB,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
     entities: [Product, ProductImage, MainCategory, SubCategory],

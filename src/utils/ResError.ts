@@ -1,9 +1,15 @@
 export class ResError extends Error {
     public readonly statusCode: number;
-
-    constructor(statusCode: number, message: string) {
-        super(message);
-        this.statusCode = statusCode;
-        Error.captureStackTrace(this, this.constructor);
+    public readonly details?: any;
+    public readonly isOperational: boolean;
+  
+    constructor(statusCode: number, message: string, details?: any, isOperational = true) {
+      super(message);
+      this.statusCode = statusCode;
+      this.details = details;
+      this.isOperational = isOperational;
+  
+      Error.captureStackTrace(this, this.constructor);
     }
-}
+  }
+  

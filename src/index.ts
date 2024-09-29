@@ -1,13 +1,16 @@
 import express, { Request, Response } from 'express';
 import multer from 'multer';
 import "reflect-metadata";
-import 'dotenv/config';
+import dotenv from 'dotenv'
 import { connectWithRetry } from '../config/app-data-source';
 import routes from './routes';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { z } from 'zod'
+import { zodToTs } from 'zod-to-ts'
 
+dotenv.config()
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -41,6 +44,11 @@ routes(app);
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
 });
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 
 app.listen(port, async () => {
     console.log(`Server starting at port ${port}`);
