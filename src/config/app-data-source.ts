@@ -1,29 +1,28 @@
 import { DataSource } from "typeorm";
-import { SubCategory } from "../src/entities/SubCategory";
-import { MainCategory } from "../src/entities/MainCategory";
-import { Product } from "../src/entities/Product";
-import { ProductImage } from "../src/entities/ProductImage";
+import { SubCategory } from "../entities/SubCategory";
+import { MainCategory } from "../entities/MainCategory";
+import { Product } from "../entities/Product";
+import { ProductImage } from "../entities/ProductImage";
 import 'dotenv/config';
-
+import { CONNECTIONLIMIT, MAX_RETRY, RETRY_DELAY, SQLPORT } from "./constant";
 
 
 export const myDataSource = new DataSource({
     type: "mysql",
     host: process.env.HOST,
-    port: 3306,
+    port: SQLPORT,
     username: process.env.USERDB,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
     entities: [Product, ProductImage, MainCategory, SubCategory],
     synchronize: true,
     extra: {
-        connectionLimit: 10,  
+        connectionLimit: CONNECTIONLIMIT,  
         keepAlive: true      
     }
 });
 
-const MAX_RETRY = 10;
-const RETRY_DELAY = 60000;
+
 
 export async function connectWithRetry() {
     let attempts = 0;

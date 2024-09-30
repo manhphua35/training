@@ -1,6 +1,6 @@
 import { productSchema } from '../schemas/productSchema';
 import { ResError } from '../utils/ResError';
-import cloudinary from '../../config/cloudinaryConfig';
+import cloudinary from '../config/cloudinaryConfig';
 import { ProductRepository } from '../repositories/ProductRepository';
 import { SubCategoryRepository } from '../repositories/SubCategoryRepository';
 import { ProductImageRepository } from '../repositories/ProductImageRepository';

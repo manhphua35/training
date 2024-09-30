@@ -8,7 +8,8 @@ declare global {
         HOST: string,
         USERNAME: string,
         PASSWORD: string,
-        DATABASE: string
+        DATABASE: string,
+        HOSTSV: string,
       }
     }
   }

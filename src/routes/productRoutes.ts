@@ -116,25 +116,7 @@ const router = Router();
  *                   type: object
  *                   description: Thông tin sản phẩm mới tạo.
  *       400:
- *         description: Lỗi xác thực hoặc thiếu dữ liệu.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: string
- *                   example: error
- *                 error:
- *                   type: string
- *                   example: Validation failed
- *                 missingFields:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Các trường thiếu hoặc không hợp lệ.
- *       400:
- *         description: Lỗi liên quan đến tệp hình ảnh tải lên.
+ *         description: Lỗi xác thực hoặc liên quan đến tệp hình ảnh.
  *         content:
  *           application/json:
  *             schema:
@@ -146,7 +128,20 @@ const router = Router();
  *                 error:
  *                   type: string
  *                   description: Lý do lỗi.
- *                   example: One or more files exceed the 5MB size limit
+ *                   examples:
+ *                     validation:
+ *                       value: Validation failed
+ *                     image_size:
+ *                       value: One or more files exceed the 5MB size limit
+ *                     image_format:
+ *                       value: Only PNG and JPG formats are allowed
+ *                     image_count:
+ *                       value: You can upload a maximum of 10 images
+ *                 missingFields:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Các trường thiếu hoặc không hợp lệ.
  *       404:
  *         description: Không tìm thấy danh mục sản phẩm.
  *         content:

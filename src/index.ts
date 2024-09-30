@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import multer from 'multer';
 import "reflect-metadata";
 import dotenv from 'dotenv'
-import { connectWithRetry } from '../config/app-data-source';
+import { connectWithRetry } from './config/app-data-source';
 import routes from './routes';
 import cors from 'cors';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -21,7 +21,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: process.env.HOSTSV,
         description: 'Local server',
       },
     ],
