@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, CreateDateColumn, BeforeInsert, OneToMany } from 'typeorm';
 import { SubCategory } from './SubCategory'; 
 import { ProductImage } from './ProductImage';
+import { User } from './User';
 
 @Entity()
 export class Product {
@@ -57,6 +58,10 @@ export class Product {
 
   @OneToMany(() => ProductImage, (image) => image.product, { cascade: true })
   images: ProductImage[];  
+
+
+  @ManyToOne(() => User, (user) => user.products)
+  user: User;
 
   @Column()
   createdDate: Date;

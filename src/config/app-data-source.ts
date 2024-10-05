@@ -5,6 +5,9 @@ import { Product } from "../entities/Product";
 import { ProductImage } from "../entities/ProductImage";
 import 'dotenv/config';
 import { CONNECTIONLIMIT, MAX_RETRY, RETRY_DELAY, SQLPORT } from "./constant";
+import { User } from "../entities/User";
+import { Permission } from "../entities/Permission";
+import { UserRole } from "../entities/UserRole";
 
 
 export const myDataSource = new DataSource({
@@ -14,14 +17,13 @@ export const myDataSource = new DataSource({
     username: process.env.USERDB,
     password: process.env.PASSWORD,
     database: process.env.DATABASE,
-    entities: [Product, ProductImage, MainCategory, SubCategory],
+    entities: [Product, ProductImage, MainCategory, SubCategory, User, Permission, UserRole],
     synchronize: true,
     extra: {
         connectionLimit: CONNECTIONLIMIT,  
         keepAlive: true      
     }
 });
-
 
 
 export async function connectWithRetry() {

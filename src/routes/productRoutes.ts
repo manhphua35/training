@@ -1,13 +1,16 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { createProduct } from '../controllers/ProductControllers';
+import { authenticateToken } from '../middlewares/authenticateToken'; // Middleware xác thực token
+import { authorizePermission } from '../middlewares/authorizePermission';
 
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage, 
-  });
+});
 
 const router = Router();
+
 /**
  * @swagger
  * /api/products/create:
@@ -16,6 +19,8 @@ const router = Router();
  *     description: Tạo một sản phẩm mới kèm với các hình ảnh sản phẩm (tối đa 10 hình ảnh, định dạng PNG và JPG, kích thước mỗi tệp không quá 5MB).
  *     tags:
  *       - Products
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -170,8 +175,11 @@ const router = Router();
  *                   example: Lỗi trong lúc tạo sản phẩm, hãy thử lại sau
  */
 
-
-
-router.post('/create', upload.array('images', 10), createProduct);
+router.post('/create', 
+  authenticateToken, // Xác thực token trước
+  authorizePermission('products', 'create'), // Kiểm tra quyền từ database
+  upload.array('images', 10), 
+  createProduct
+);
 
 export default router;

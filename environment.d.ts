@@ -10,6 +10,7 @@ declare global {
         PASSWORD: string,
         DATABASE: string,
         HOSTSV: string,
+        JWT_SECRET: string
       }
     }
   }

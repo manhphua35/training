@@ -1,4 +1,4 @@
-export class ResError extends Error {
+export class AppError extends Error {
     public readonly statusCode: number;
     public readonly details?: any;
     public readonly isOperational: boolean;
@@ -13,3 +13,4 @@ export class ResError extends Error {
     }
   }
   
+

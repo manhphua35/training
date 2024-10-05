@@ -1,12 +1,15 @@
-import { productSchema } from '../schemas/productSchema';
-import { ResError } from '../utils/ResError';
 import cloudinary from '../config/cloudinaryConfig';
+import { AppError } from '../utils/AppError';
 import { ProductRepository } from '../repositories/ProductRepository';
 import { SubCategoryRepository } from '../repositories/SubCategoryRepository';
 import { ProductImageRepository } from '../repositories/ProductImageRepository';
+import { ProductImage } from '../entities/ProductImage';
+import { Product } from '../entities/Product';
+import { MESSAGES, STATUS_CODES } from '../config/constant';
+import { IProductService } from '../interfaces/IProductService';  
 
-export class ProductService {
-  
+export class ProductService implements IProductService {
+
   async uploadImageFromBuffer(buffer: Buffer): Promise<{ url: string, public_id: string }> {
     return new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream({
@@ -28,10 +31,9 @@ export class ProductService {
         ]
       }, (error, result) => {
         if (error || !result) {
-          console.log('Upload Error:', error);
-          return reject(new ResError(500, `Failed to upload image to Cloudinary`));
+          return reject(new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.IMAGE_UPLOAD_FAILED));
         }
-        resolve({ url: result.secure_url, public_id: result.public_id });  
+        resolve({ url: result.secure_url, public_id: result.public_id });
       });
 
       uploadStream.end(buffer);
@@ -40,62 +42,55 @@ export class ProductService {
 
   async deleteImageFromCloudinary(publicId: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      cloudinary.uploader.destroy(publicId, (error, result) => {
+      cloudinary.uploader.destroy(publicId, (error) => {
         if (error) {
-          return reject(new ResError(500, `Failed to delete image from Cloudinary: `));
+          return reject(new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.IMAGE_UPLOAD_FAILED));
         }
         resolve();
       });
     });
   }
 
-  async createProduct(productData: any, imageBuffers: Buffer[]): Promise<any> {
-    const parsedProduct = productSchema.safeParse(productData);
-    if (!parsedProduct.success) {
-      const missingOrInvalidFields = parsedProduct.error.errors.map((err) => err.path.join('.'));
-      throw new ResError(400, 'Missing or invalid fields', missingOrInvalidFields);
-    }
-
-    const existingProduct = await ProductRepository.findOneBy({ serialNumber: parsedProduct.data.serialNumber });
-    if (existingProduct) {
-      throw new ResError(400, 'Product with this serial number already exists');
-    }
-
-    const subCategory = await SubCategoryRepository.findOneBy({
-      id: parsedProduct.data.category,
-    });
-
+  async createProduct(productData: Product, imageBuffers: Buffer[]): Promise<Product> {
+    const subCategory = await SubCategoryRepository.findOneBy({ id: productData.category.id });
     if (!subCategory) {
-      throw new ResError(404, 'SubCategory not found');
+      throw new AppError(STATUS_CODES.NOT_FOUND, MESSAGES.USER_ERROR.SUBCATEGORY_NOT_FOUND);
     }
 
     const product = ProductRepository.create({
-      ...parsedProduct.data,
+      ...productData,
       category: subCategory,
     });
 
     const savedProduct = await ProductRepository.save(product);
 
-    const uploadedImages = [];
+    const uploadedImages: ProductImage[] = [];
+
     try {
       const imagePromises = imageBuffers.map(async (buffer) => {
         const { url, public_id } = await this.uploadImageFromBuffer(buffer);
+
         const image = ProductImageRepository.create({
           url,
           public_id,
           product: savedProduct,
         });
-        return ProductImageRepository.save(image);
+
+        return await ProductImageRepository.save(image);
       });
 
-      uploadedImages.push(...await Promise.all(imagePromises));
+      const savedImages = await Promise.all(imagePromises);
+      uploadedImages.push(...savedImages);
 
       return savedProduct;
+
     } catch (error) {
+
       await Promise.all(uploadedImages.map((image) => this.deleteImageFromCloudinary(image.public_id)));
+
       await ProductRepository.remove(savedProduct);
-      throw new ResError(400, 'Sever error');
+
+      throw new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.PRODUCT_CREATION_FAILED);
     }
   }
-
 }

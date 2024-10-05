@@ -9,6 +9,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { z } from 'zod'
 import { zodToTs } from 'zod-to-ts'
+import bodyParser from 'body-parser';
 
 dotenv.config()
 const swaggerOptions = {
@@ -29,11 +30,16 @@ const swaggerOptions = {
   apis: ['./src/routes/*.ts'], 
 };
 
-const app = express();
-const port = process.env.PORT;
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }))
+
+app.use(bodyParser.json())
+const port = process.env.PORT;
+
 
 app.use(cors());
 

@@ -6,6 +6,7 @@
     "module": "commonjs",
     "strict": true,
     "strictPropertyInitialization": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./src/types"] // Thêm đúng đường dẫn đến thư mục types
   }
 }
