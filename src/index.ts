@@ -35,7 +35,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }));
 
 app.use(bodyParser.json())
 const port = process.env.PORT;

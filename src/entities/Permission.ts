@@ -1,17 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { UserRole } from './UserRole'; // Đổi tên từ Role thành UserRole
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Permission {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => UserRole, (userRole) => userRole.permissions, { onDelete: 'CASCADE' })
-  userRole: UserRole;
+  @Column({ type: 'varchar', length: 100, unique: true })
+  nameofpermission: string; // Tên quyền, ví dụ: 'CAN_VIEW_USERS', 'CAN_EDIT_PRODUCTS'
 
-  @Column({ type: 'varchar', length: 50 })
-  collection: string;
-
-  @Column({ type: 'varchar', length: 50 })
-  action: string;
+  @Column({ type: 'text', nullable: true })
+  description: string; // Mô tả quyền để hiểu rõ hơn quyền này dùng để làm gì
 }

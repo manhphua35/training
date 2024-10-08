@@ -5,10 +5,8 @@ import { SubCategoryRepository } from '../repositories/SubCategoryRepository';
 import { ProductImageRepository } from '../repositories/ProductImageRepository';
 import { ProductImage } from '../entities/ProductImage';
 import { Product } from '../entities/Product';
-import { MESSAGES, STATUS_CODES } from '../config/constant';
-import { IProductService } from '../interfaces/IProductService';  
 
-export class ProductService implements IProductService {
+export class ProductService {
 
   async uploadImageFromBuffer(buffer: Buffer): Promise<{ url: string, public_id: string }> {
     return new Promise((resolve, reject) => {
@@ -31,7 +29,7 @@ export class ProductService implements IProductService {
         ]
       }, (error, result) => {
         if (error || !result) {
-          return reject(new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.IMAGE_UPLOAD_FAILED));
+          return reject(new AppError(500, 'Failed to upload images')); // Hardcoded message
         }
         resolve({ url: result.secure_url, public_id: result.public_id });
       });
@@ -44,7 +42,7 @@ export class ProductService implements IProductService {
     return new Promise((resolve, reject) => {
       cloudinary.uploader.destroy(publicId, (error) => {
         if (error) {
-          return reject(new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.IMAGE_UPLOAD_FAILED));
+          return reject(new AppError(500, 'Failed to delete images from cloudinary')); // Hardcoded message
         }
         resolve();
       });
@@ -54,7 +52,7 @@ export class ProductService implements IProductService {
   async createProduct(productData: Product, imageBuffers: Buffer[]): Promise<Product> {
     const subCategory = await SubCategoryRepository.findOneBy({ id: productData.category.id });
     if (!subCategory) {
-      throw new AppError(STATUS_CODES.NOT_FOUND, MESSAGES.USER_ERROR.SUBCATEGORY_NOT_FOUND);
+      throw new AppError(404, 'Subcategory not found'); // Hardcoded message
     }
 
     const product = ProductRepository.create({
@@ -90,7 +88,29 @@ export class ProductService implements IProductService {
 
       await ProductRepository.remove(savedProduct);
 
-      throw new AppError(STATUS_CODES.INTERNAL_SERVER_ERROR, MESSAGES.DB_ERROR.PRODUCT_CREATION_FAILED);
+      throw new AppError(500, 'Error during product creation, please try again later'); 
     }
   }
+
+
+  async updateProduct(productId: string, userId: any, updatedData: Partial<Product>): Promise<Product> {
+    // Tìm sản phẩm theo productId và userId để đảm bảo người dùng sở hữu sản phẩm này
+    const product = await ProductRepository.findOne({
+      where: { serialNumber: productId, user: { id: userId } }
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    // Cập nhật thông tin sản phẩm với dữ liệu mới từ body
+    Object.assign(product, updatedData); 
+
+    // Lưu sản phẩm đã được cập nhật
+    await ProductRepository.save(product);
+
+    return product;
+  }
+
+  
 }

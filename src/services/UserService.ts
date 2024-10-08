@@ -1,111 +1,107 @@
 import bcrypt from 'bcryptjs';
-import { SALT_ROUNDS } from '../config/constant';
-import { UserRepository } from '../repositories/UserRepository'; // Import UserRepository
-import { UserRoleRepository } from '../repositories/UserRoleRepository'; // Import RoleRepository
-import { User } from '../entities/User'; // Import User entity
-import { UserRoleEnum, UserRole } from '../entities/UserRole'; // Import Role entity và UserRole enum
-import { DeepPartial } from 'typeorm'; // Import DeepPartial từ TypeORM
+import { UserRepository } from '../repositories/UserRepository';
+import { UserRoleRepository } from '../repositories/UserRoleRepository';
+import { User } from '../entities/User';
+import { UserRoleEnum } from '../entities/UserRole';
+import { DeepPartial } from 'typeorm';
 
 export class UserService {
   // Hàm mã hóa mật khẩu
   async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, SALT_ROUNDS);
-  }
-
-  // Hàm kiểm tra mật khẩu
-  async checkUserPassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
-  }
-
-  // Kiểm tra xem người dùng có tồn tại hay không
-  async checkUserExists(id: number): Promise<boolean> {
-    const count = await UserRepository.count({ where: { id } });
-    return count > 0;
+    return bcrypt.hash(password, 10);
   }
 
   // Đăng ký người dùng mới
-  // Đăng ký người dùng mới
-async register(userData: DeepPartial<User>) {
-  const { nameofUser, email, password, phone, gender } = userData;
-
-  // Kiểm tra nếu password bị thiếu
-  if (!password) {
-    throw new Error('Password is required');
-  }
-
-  // Kiểm tra xem email đã tồn tại chưa
-  const existingUser = await UserRepository.findOne({ where: { email } });
-  if (existingUser) {
-    throw new Error('Email đã tồn tại');
-  }
-
-  // Mã hóa mật khẩu bằng hàm hashPassword()
-  const hashedPassword = await this.hashPassword(password);
-
-  // Nếu người dùng chưa được gán role nào, gán role mặc định là 'CUSTOMER'
-  const defaultRole = await UserRoleRepository.findOne({ where: { roleName: UserRoleEnum.CUSTOMER } });
-
-  if (!defaultRole) {
-    throw new Error('Vai trò khách hàng mặc định không tồn tại');
-  }
-
-  // Tạo người dùng mới
-  const newUser = UserRepository.create({
-    nameofUser,
-    email,
-    password: hashedPassword,
-    phone,
-    gender,
-    roles: [defaultRole], // Gán role mặc định là 'CUSTOMER'
-  });
-
-  await UserRepository.save(newUser);
-
-  return { message: 'Đăng ký thành công' };
-}
-
-
-  // Tạo người dùng mới thông qua admin
-  async createUserByAdmin(adminUser: User, userData: DeepPartial<User>, roleName: UserRoleEnum): Promise<{ message: string }> {
+  async register(userData: DeepPartial<User>) {
     const { nameofUser, email, password, phone, gender } = userData;
 
+    // Kiểm tra nếu password bị thiếu
     if (!password) {
-      throw new Error('Password is required');
-    }
-
-    // Kiểm tra quyền của admin
-    const isAdmin = adminUser.roles.some((role: UserRole) => role.roleName === UserRoleEnum.ADMIN);
-    if (!isAdmin) {
-      throw new Error('Bạn không có quyền tạo người dùng.');
+      return 'Password is required'; // Chỉ trả về thông báo lỗi
     }
 
     // Kiểm tra xem email đã tồn tại chưa
     const existingUser = await UserRepository.findOne({ where: { email } });
     if (existingUser) {
-      throw new Error('Email đã tồn tại');
+      return 'Email đã tồn tại'; // Chỉ trả về thông báo lỗi
     }
 
     // Mã hóa mật khẩu
     const hashedPassword = await this.hashPassword(password);
 
-    // Tìm role cho người dùng được tạo
-    const role = await UserRoleRepository.findOne({ where: { roleName } });
-    if (!role) {
-      throw new Error(`Vai trò ${roleName} không tồn tại`);
+    const defaultRole = await UserRoleRepository.findOne({ where: { roleName: UserRoleEnum.CUSTOMER } });
+
+    if (!defaultRole) {
+      return 'Vai trò khách hàng mặc định không tồn tại'; 
     }
 
-    // Tạo người dùng mới với role do admin chỉ định
     const newUser = UserRepository.create({
       nameofUser,
       email,
       password: hashedPassword,
       phone,
       gender,
-      roles: [role],
+      roles: [defaultRole],
     });
 
     await UserRepository.save(newUser);
 
-    return { message: 'Người dùng đã được tạo thành công bởi admin' };
+    return { message: 'Đăng ký thành công' };
+  }
+
+  async createUserByAdmin(userData: DeepPartial<User>) {
+    const { nameofUser, email, password, phone, gender, roles } = userData;
+
+    // Check if the password is provided
+    if (!password) {
+      return 'Password is required';
+    }
+
+    // Check if the email is already in use
+    const existingUser = await UserRepository.findOne({ where: { email } });
+    if (existingUser) {
+      return 'Email already exists';
+    }
+
+    // Hash the password before saving
+    const hashedPassword = await this.hashPassword(password);
+
+    // Find the roles provided by the admin or default to CUSTOMER role
+    let assignedRoles;
+    if (roles && roles.length > 0) {
+      assignedRoles = await UserRoleRepository.findByIds(roles);
+    } else {
+      const defaultRole = await UserRoleRepository.findOne({ where: { roleName: UserRoleEnum.CUSTOMER } });
+      if (!defaultRole) {
+        return 'Default customer role not found';
+      }
+      assignedRoles = [defaultRole];
+    }
+
+    // Create the new user entity
+    const newUser = UserRepository.create({
+      nameofUser,
+      email,
+      password: hashedPassword,
+      phone,
+      gender,
+      roles: assignedRoles,
+    });
+
+    // Save the new user to the database
+    await UserRepository.save(newUser);
+
+    return { message: 'User created successfully by admin' };
+  }
+
+
+  async getAllUsers() {
+    // Lấy danh sách người dùng bao gồm quan hệ với `roles` và `products`
+    const users = await UserRepository.find({
+      relations: ['roles', 'products'],
+    });
+    return users;
   }
 }
+
+

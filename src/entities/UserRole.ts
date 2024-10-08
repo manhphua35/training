@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
 import { Permission } from './Permission'; // Import Permission entity
 import { User } from './User'; // Import User entity
 
@@ -12,15 +12,20 @@ export enum UserRoleEnum {
   GUEST = 'guest'
 }
 
-@Entity('user_roles') // Tên bảng cho bảng UserRole
+@Entity('user_roles')
 export class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'enum', enum: UserRoleEnum, unique: true })
-  roleName: UserRoleEnum; // Sử dụng enum
+  roleName: UserRoleEnum;
 
-  @OneToMany(() => Permission, (permission) => permission.userRole, { cascade: true })
+  @ManyToMany(() => Permission, { cascade: true })
+  @JoinTable({
+    name: 'role_permissions',
+    joinColumn: { name: 'role_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'permission_id', referencedColumnName: 'id' },
+  })
   permissions: Permission[];
 
   @ManyToMany(() => User, (user) => user.roles)

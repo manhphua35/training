@@ -1,9 +1,9 @@
 // src/types/express.d.ts
-import { UserRoleEnum } from "../../entities/UserRole";
+import { UserRoleEnum } from "../entities/UserRole";
 
 declare global {
   namespace Express {
-    export interface Request {
+    interface Request {
       user?: {
         userId: number;
         email: string;
@@ -13,4 +13,3 @@ declare global {
   }
 }
 
-export {};

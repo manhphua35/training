@@ -1,4 +1,3 @@
-import { MESSAGES } from '../config/constant';
 import { ICategoryService } from '../interfaces/ICategoryService';
 import { MainCategoryRepository } from '../repositories/MainCategoryRepository';
 import { AppError } from '../utils/AppError';
@@ -16,7 +15,7 @@ export class CategoryService implements ICategoryService{
       });
       return categories;
     } catch (error) {
-      throw new AppError(400, MESSAGES.DB_ERROR.FETCH_CATEGORIES_FAILED);  // Sử dụng thông báo từ constant
+      throw new AppError(400, 'Internal Error');  // Sử dụng thông báo từ constant
     }
   }
 }
